@@ -1,0 +1,16 @@
+{
+  "name": "framord",
+  "productName": "Framord",
+  "version": "1.0.0",
+  "description": "Framord · 批量照片命名",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/planner.test.js test/exif.test.js test/renamer.test.js test/randomizer.test.js test/scanner.test.js",
+    "smoke": "electron . --smoke"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

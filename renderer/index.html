@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <title>Framord</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand drag">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+          <path class="brand-tile" d="M6.4 1H17.3L23 6.7V18.4A4.6 4.6 0 0 1 18.4 23H6.4A4.6 4.6 0 0 1 1.8 18.4V6.6A4.6 4.6 0 0 1 6.4 1Z" />
+          <path class="brand-glyph" d="M6.2 5.6H19V8.8H9.4V11H16V14.2H9.4V18.4H6.2V5.6Z" />
+        </svg>
+        <div class="brand-type">
+          <span class="brand-cn">Framord</span>
+          <span class="brand-en">照片批量命名</span>
+        </div>
+      </div>
+
+      <div class="rail-scroll">
+        <section class="panel rules">
+          <div class="panel-head"><span class="panel-title">命名规则</span></div>
+          <div class="rules-body">
+            <div class="segmented segmented-block tabs" role="tablist">
+              <button class="segmented-item tab is-active" data-mode="template" role="tab" aria-selected="true">模板命名</button>
+              <button class="segmented-item tab" data-mode="replace" role="tab" aria-selected="false">查找替换</button>
+            </div>
+
+            <div class="pane" id="paneTemplate">
+              <div class="template-field">
+                <input id="templateInput" spellcheck="false" autocomplete="off">
+              </div>
+              <div class="tokens" id="tokens">
+                <button class="token" data-token="{word}" title="{word} 随机单词">单词</button>
+                <button class="token" data-token="{rand}" title="{rand} 6 位随机码">随机码</button>
+                <button class="token" data-token="{date}" title="{date} 拍摄日期">日期</button>
+                <button class="token" data-token="{time}" title="{time} 拍摄时间">时间</button>
+                <button class="token" data-token="{seq}" title="{seq} 序号">序号</button>
+                <button class="token" data-token="{name}" title="{name} 原文件名">原名</button>
+                <button class="token" data-token="{folder}" title="{folder} 所在文件夹">文件夹</button>
+                <button class="token" data-token="{year}" title="{year} 年">年</button>
+                <button class="token" data-token="{month}" title="{month} 月">月</button>
+                <button class="token" data-token="{day}" title="{day} 日">日</button>
+              </div>
+              <div class="num-row" id="numRow">
+                <label class="num"><span>起始</span><input id="startIndex" type="number" min="0" max="999999" step="1" value="1"></label>
+                <label class="num"><span>位数</span><input id="padWidth" type="number" min="1" max="8" step="1" value="3"></label>
+              </div>
+            </div>
+
+            <div class="pane" id="paneReplace" hidden>
+              <div class="replace-grid">
+                <label class="stacked"><span class="field-cap">查找</span><input id="findInput" spellcheck="false" autocomplete="off"></label>
+                <label class="stacked"><span class="field-cap">替换为</span><input id="replaceInput" spellcheck="false" autocomplete="off"></label>
+              </div>
+              <div class="replace-switches">
+                <label class="check"><input type="checkbox" id="regexToggle"><span>正则表达式</span></label>
+                <label class="check"><input type="checkbox" id="caseToggle"><span>区分大小写</span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel scan">
+          <div class="panel-head"><span class="panel-title">扫描</span></div>
+          <div class="panel-body">
+            <label class="switch-row">
+              <span>包含子目录</span>
+              <span class="switch"><input type="checkbox" id="recursiveToggle" checked><i></i></span>
+            </label>
+            <label class="field">
+              <span class="field-cap">类型</span>
+              <select id="typeFilter">
+                <option value="all">全部照片</option>
+                <option value="jpeg">JPEG</option>
+                <option value="png">PNG</option>
+                <option value="heic">HEIC · AVIF</option>
+                <option value="tiff">TIFF</option>
+                <option value="raw">RAW</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-cap">排序</span>
+              <select id="sortKey">
+                <option value="name">文件名</option>
+                <option value="capture">拍摄时间</option>
+                <option value="mtime">修改时间</option>
+                <option value="size">文件大小</option>
+              </select>
+            </label>
+            <div class="seg-row">
+              <span class="field-cap">方向</span>
+              <div class="segmented seg" id="sortDirGroup">
+                <button class="segmented-item seg-btn is-active" data-dir="asc">升序</button>
+                <button class="segmented-item seg-btn" data-dir="desc">降序</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel history">
+          <div class="panel-head">
+            <span class="panel-title">历史</span>
+            <span class="panel-meta" id="historyCount">0</span>
+          </div>
+          <ul class="history" id="historyList"></ul>
+        </section>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <header class="topbar drag">
+        <div class="source-bar">
+          <button class="btn" id="pickBtn">
+            <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M1.8 4.4h4l1.2 1.4h7.2v6a1.4 1.4 0 0 1-1.4 1.4H3.2a1.4 1.4 0 0 1-1.4-1.4V4.4Z" />
+            </svg>
+            <span>选择文件夹</span>
+          </button>
+          <button class="btn btn-icon-only" id="revealBtn" disabled title="在资源管理器中打开" aria-label="在资源管理器中打开">
+            <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M6.2 3.4H3.6A1.6 1.6 0 0 0 2 5v7a1.6 1.6 0 0 0 1.6 1.6h7A1.6 1.6 0 0 0 12.2 12v-2.6" />
+              <path d="M9.4 2.4h4.2v4.2" />
+              <path d="M13.6 2.4 7.8 8.2" />
+            </svg>
+          </button>
+          <div class="source-path" id="topPath">未选择来源</div>
+        </div>
+        <div class="topbar-meta">
+          <span><b id="metricCount">0</b> 张</span>
+          <span class="meta-sep"></span>
+          <span id="metricBytes">—</span>
+          <span class="meta-sep"></span>
+          <span><b id="metricFolders">—</b> 目录</span>
+        </div>
+      </header>
+
+      <section class="preview">
+        <div class="preview-toolbar">
+          <span class="preview-title">命名预览</span>
+          <div class="preview-tools">
+            <button class="link-btn" id="resetOverrides" hidden>清除手动改名</button>
+            <label class="switch-row compact">
+              <span>仅显示变更</span>
+              <span class="switch small"><input type="checkbox" id="onlyChanged"><i></i></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="preview-head">
+          <div class="cell-check"><input type="checkbox" id="selectAll" aria-label="全选"></div>
+          <div class="cell-index head-label">帧</div>
+          <div class="cell-name head-label">原名</div>
+          <div class="cell-mark"></div>
+          <div class="cell-name head-label">新名</div>
+          <div class="cell-time head-label">拍摄时间</div>
+          <div class="cell-size head-label">大小</div>
+          <div class="cell-state head-label">状态</div>
+        </div>
+
+        <div class="preview-body" id="scroller">
+          <div class="preview-track" id="track">
+            <div class="row-list" id="rowList"></div>
+          </div>
+          <div class="empty" id="emptyState">
+            <svg viewBox="0 0 24 24" class="empty-mark" aria-hidden="true">
+              <path class="brand-tile" d="M6.4 1H17.3L23 6.7V18.4A4.6 4.6 0 0 1 18.4 23H6.4A4.6 4.6 0 0 1 1.8 18.4V6.6A4.6 4.6 0 0 1 6.4 1Z" />
+              <path class="brand-glyph" d="M6.2 5.6H19V8.8H9.4V11H16V14.2H9.4V18.4H6.2V5.6Z" />
+            </svg>
+            <p class="empty-title" id="emptyTitle">拖入文件夹</p>
+            <p class="empty-sub" id="emptySub">JPEG · PNG · HEIC · TIFF · RAW</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="actionbar">
+        <div class="summary" id="summary"></div>
+        <div class="action-buttons">
+          <button class="btn" id="undoBtn" disabled>
+            <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M3.2 7.2h7a3.4 3.4 0 0 1 0 6.8H7.4" />
+              <path d="M5.8 4.6 3.2 7.2l2.6 2.6" />
+            </svg>
+            <span>撤销上一批</span>
+          </button>
+          <button class="btn btn-solid" id="runBtn" disabled>
+            <span>执行重命名</span>
+            <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M3.2 8h9.6" />
+              <path d="m8.8 4 4 4-4 4" />
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <div class="busy" id="busy" hidden>
+    <div class="busy-panel">
+      <div class="busy-label" id="busyLabel">正在处理</div>
+      <div class="busy-count" id="busyCount"></div>
+      <div class="busy-track"><div class="busy-fill" id="busyFill"></div></div>
+    </div>
+  </div>
+
+  <div class="toast-holder" id="toastHolder"></div>
+
+  <script src="../shared/planner.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
