@@ -4,6 +4,26 @@
   "version": "1.0.0",
   "description": "Framord · 批量照片命名",
   "private": true,
+  "license": "MIT",
+  "author": "K1Super",
+  "homepage": "https://github.com/K1Super/Framord#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/K1Super/Framord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/K1Super/Framord/issues"
+  },
+  "keywords": [
+    "electron",
+    "photo",
+    "rename",
+    "batch",
+    "exif"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
