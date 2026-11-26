@@ -34,16 +34,23 @@
                 <input id="templateInput" spellcheck="false" autocomplete="off">
               </div>
               <div class="tokens" id="tokens">
-                <button class="token" data-token="{word}" title="{word} 随机单词">单词</button>
-                <button class="token" data-token="{rand}" title="{rand} 6 位随机码">随机码</button>
-                <button class="token" data-token="{date}" title="{date} 拍摄日期">日期</button>
-                <button class="token" data-token="{time}" title="{time} 拍摄时间">时间</button>
-                <button class="token" data-token="{seq}" title="{seq} 序号">序号</button>
-                <button class="token" data-token="{name}" title="{name} 原文件名">原名</button>
-                <button class="token" data-token="{folder}" title="{folder} 所在文件夹">文件夹</button>
-                <button class="token" data-token="{year}" title="{year} 年">年</button>
-                <button class="token" data-token="{month}" title="{month} 月">月</button>
-                <button class="token" data-token="{day}" title="{day} 日">日</button>
+                <div class="token-row">
+                  <button class="token" data-token="{word}" title="{word} 随机单词">单词</button>
+                  <button class="token" data-token="{rand}" title="{rand} 6 位随机码">随机码</button>
+                  <button class="token" data-token="{rnum}" title="{rnum} 6 位随机数字码">数字码</button>
+                  <button class="token" data-token="{date}" title="{date} 拍摄日期">日期</button>
+                </div>
+                <div class="token-row">
+                  <button class="token" data-token="{time}" title="{time} 拍摄时间">时间</button>
+                  <button class="token" data-token="{seq}" title="{seq} 序号">序号</button>
+                  <button class="token" data-token="{name}" title="{name} 原文件名">原名</button>
+                  <button class="token" data-token="{folder}" title="{folder} 所在文件夹">文件夹</button>
+                </div>
+                <div class="token-row">
+                  <button class="token" data-token="{year}" title="{year} 年">年</button>
+                  <button class="token" data-token="{month}" title="{month} 月">月</button>
+                  <button class="token" data-token="{day}" title="{day} 日">日</button>
+                </div>
               </div>
               <div class="num-row" id="numRow">
                 <label class="num"><span>起始</span><input id="startIndex" type="number" min="0" max="999999" step="1" value="1"></label>

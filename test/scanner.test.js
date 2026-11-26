@@ -36,12 +36,16 @@ test('扫描照片并分配随机单词与随机码', async function () {
     assert.ok(data.dirIndex[root].includes('note.txt'));
 
     const codes = new Set();
+    const numbers = new Set();
     data.files.forEach(function verify(file) {
       assert.match(file.randomCode, /^[A-Z][A-Z0-9]{5}$/);
+      assert.match(file.randomNumber, /^[1-9]\d{5}$/);
       assert.ok(file.randomWord);
       codes.add(file.randomCode);
+      numbers.add(file.randomNumber);
     });
     assert.strictEqual(codes.size, 3);
+    assert.strictEqual(numbers.size, 3);
   });
 });
 

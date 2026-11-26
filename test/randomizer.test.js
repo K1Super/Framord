@@ -37,3 +37,13 @@ test('单词数量不足时循环使用但随机码仍唯一', function () {
   assert.strictEqual(codes.size, files.length);
   assert.ok(files.every(function word(file) { return file.randomWord; }));
 });
+
+test('随机数字码为六位纯数字且批内唯一', function () {
+  const files = assignRandomNames(makeFiles(1200));
+  const numbers = new Set();
+  files.forEach(function verify(file) {
+    assert.match(file.randomNumber, /^[1-9]\d{5}$/);
+    numbers.add(file.randomNumber);
+  });
+  assert.strictEqual(numbers.size, files.length);
+});

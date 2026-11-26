@@ -122,6 +122,12 @@ test('随机命名在重复预览时保持稳定', function () {
   );
 });
 
+test('六位随机数字码令牌', function () {
+  const files = [photo('a.jpg', { randomNumber: '481026' })];
+  const plan = build(files, { template: '{rnum}_{name}' });
+  assert.strictEqual(plan.items[0].targetName, '481026_a.jpg');
+});
+
 test('取消选中的条目不占用序号、不计入重复与统计', function () {
   const files = [photo('a.jpg'), photo('b.jpg')];
   const selected = new Set([files[1].path]);

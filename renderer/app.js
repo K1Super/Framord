@@ -214,10 +214,6 @@
       scheduleRecompute();
     });
 
-    elements.emptyState.addEventListener('click', function openFromEmpty() {
-      if (!state.busy) chooseFolder();
-    });
-
     elements.runBtn.addEventListener('click', runRename);
     elements.undoBtn.addEventListener('click', function undoLatest() {
       const entry = state.history.find(function find(item) { return !item.undone; });

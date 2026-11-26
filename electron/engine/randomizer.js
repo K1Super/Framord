@@ -6,6 +6,9 @@ const crypto = require('node:crypto');
 const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 const CODE_LENGTH = 6;
 
+const NUMBER_MIN = 100000;
+const NUMBER_MAX = 999999;
+
 const WORDS = [
   'Aurora', 'Amber', 'Aspen', 'Atlas', 'Autumn', 'Azure', 'Basin', 'Beacon', 'Birch', 'Bloom',
   'Breeze', 'Brook', 'Cactus', 'Canyon', 'Cedar', 'Celeste', 'Cinder', 'Citrus', 'Clover', 'Coast',
@@ -25,15 +28,17 @@ const WORDS = [
 ];
 
 /**
- * 为扫描结果分配随机单词与随机码。
- * 随机码在整批照片内全局唯一，单词尽量不重复，照片数量超过词库时循环使用。
+ * 为扫描结果分配随机单词、随机码与 6 位随机数字码。
+ * 随机码与数字码均在整批照片内全局唯一，单词尽量不重复，照片数量超过词库时循环使用。
  */
 function assignRandomNames(files) {
   const pool = shuffle(WORDS.slice());
   const usedCodes = new Set();
+  const usedNumbers = new Set();
   files.forEach(function assign(file, index) {
     file.randomWord = pool[index % pool.length];
     file.randomCode = createCode(usedCodes);
+    file.randomNumber = createNumber(usedNumbers);
   });
   return files;
 }
@@ -54,6 +59,28 @@ function createCode(usedCodes) {
   const fallback = crypto.randomBytes(8).toString('hex').toUpperCase();
   usedCodes.add(fallback);
   return fallback;
+}
+
+/**
+ * 生成 6 位纯数字随机码（100000–999999），批内唯一。
+ * 区间接近占满时退化为顺序探测空位，避免死循环，仍保持 6 位与唯一。
+ */
+function createNumber(usedNumbers) {
+  for (let attempt = 0; attempt < 500; attempt += 1) {
+    const value = crypto.randomInt(NUMBER_MIN, NUMBER_MAX + 1);
+    if (usedNumbers.has(value)) continue;
+    usedNumbers.add(value);
+    return String(value);
+  }
+  const span = NUMBER_MAX - NUMBER_MIN + 1;
+  const start = crypto.randomInt(NUMBER_MIN, NUMBER_MAX + 1);
+  for (let offset = 0; offset < span; offset += 1) {
+    const value = NUMBER_MIN + ((start - NUMBER_MIN + offset) % span);
+    if (usedNumbers.has(value)) continue;
+    usedNumbers.add(value);
+    return String(value);
+  }
+  return '';
 }
 
 function shuffle(list) {

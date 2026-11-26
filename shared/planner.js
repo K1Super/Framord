@@ -84,6 +84,8 @@
         case 'code':
         case 'random':
           return context.random || '';
+        case 'rnum':
+          return context.number == null ? '' : String(context.number);
         case 'seq':
         case 'index':
           return padNumber(context.index, widthText ? Math.min(8, Math.max(1, Number(widthText))) : context.padWidth);
@@ -217,7 +219,8 @@
           padWidth: padWidth,
           date: date,
           word: file.randomWord || '',
-          random: file.randomCode || ''
+          random: file.randomCode || '',
+          number: file.randomNumber || ''
         });
       } else {
         const replaced = applyReplace(baseName, {

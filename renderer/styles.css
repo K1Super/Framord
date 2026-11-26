@@ -426,6 +426,8 @@ textarea {
   background: var(--surface-2);
   font-size: 13.5px;
   letter-spacing: 0.02em;
+  /* 行盒需完整容纳下沉字形，否则下划线在 100% 缩放下会被行盒裁掉 */
+  line-height: 42px;
   color: var(--ink);
   transition:
     border-color var(--dur-1) var(--ease),
@@ -445,9 +447,15 @@ textarea {
 
 .tokens {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
   margin-top: 11px;
+}
+
+.token-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .token {
@@ -543,6 +551,8 @@ textarea {
   border-radius: var(--r-sm);
   background: var(--surface);
   font-size: 12px;
+  /* 行盒需完整容纳下沉字形，否则下划线会被行盒裁掉 */
+  line-height: 34px;
   color: var(--ink);
   transition: border-color var(--dur-1) var(--ease);
 }
@@ -1202,7 +1212,6 @@ input[type="checkbox"]:disabled {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: opacity var(--dur-2) var(--ease);
 }
 
@@ -1226,11 +1235,6 @@ input[type="checkbox"]:disabled {
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--ink-2);
-  transition: color var(--dur-1) var(--ease);
-}
-
-.empty:hover .empty-title {
-  color: var(--ink);
 }
 
 .empty-sub {
